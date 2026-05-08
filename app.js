@@ -864,7 +864,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!game.started) return;
         
         // Prevent event on side panels from triggering cat movement
-        if (e.clientX < 410 && window.innerWidth > 768) {
+        if (e.target.closest('#dojo-panel')) {
             mouse.active = false;
             return;
         }
@@ -878,7 +878,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     window.addEventListener('mousedown', (e) => {
         if (!game.started) return;
-        if (e.clientX < 410 && window.innerWidth > 768) return;
+        if (e.target.closest('#dojo-panel')) return;
         
         mouse.clicked = true;
         // Heavy strike triggers on click
@@ -892,27 +892,27 @@ document.addEventListener('DOMContentLoaded', () => {
     // Touch screen compatible
     window.addEventListener('touchmove', (e) => {
         if (!game.started || e.touches.length === 0) return;
-        const touch = e.touches[0];
-        if (touch.clientX < 410 && window.innerWidth > 768) {
+        if (e.target.closest('#dojo-panel')) {
             mouse.active = false;
             return;
         }
+        const touch = e.touches[0];
         mouse.x = touch.clientX;
         mouse.y = touch.clientY;
         mouse.active = true;
-    });
+    }, { passive: true });
     
     window.addEventListener('touchstart', (e) => {
         if (!game.started || e.touches.length === 0) return;
+        if (e.target.closest('#dojo-panel')) return;
         const touch = e.touches[0];
-        if (touch.clientX < 410 && window.innerWidth > 768) return;
         
         mouse.x = touch.clientX;
         mouse.y = touch.clientY;
         mouse.active = true;
         mouse.clicked = true;
         performSingleAttack(true);
-    });
+    }, { passive: true });
     
     window.addEventListener('touchend', () => {
         mouse.clicked = false;
