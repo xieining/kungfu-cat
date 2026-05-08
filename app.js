@@ -916,6 +916,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     window.addEventListener('touchend', () => {
         mouse.clicked = false;
+        mouse.active = false;
     });
 
     appContainer.addEventListener('mouseleave', () => {
