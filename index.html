@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>武打貓咪極致互動道場 | Kung-Fu Cat Dojo Arena</title>
+    <meta name="description" content="一個極致動態、極高畫質的互動式功夫貓咪網頁！貓咪會以物理彈性力學瘋狂追擊您的鼠標，爆發連續拳法、神威踢腿與霓虹彩虹狂熱模式，支援網頁音效合成與上傳自訂貓咪照片！">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&family=Outfit:wght@300;400;600;800&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- Main Style Sheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Start Dojo Screen Overlay (For Web Audio API Initialization) -->
+    <div id="start-overlay" class="overlay">
+        <div class="overlay-card">
+            <h1 class="glow-text">KUNG-FU CAT DOJO</h1>
+            <h2 class="sub-glow-text">武打貓咪極致互動道場</h2>
+            <div class="card-art">
+                <img src="default_kungfu_cat.png" alt="Kung Fu Kitten" class="overlay-kitty">
+            </div>
+            <p class="overlay-desc">準備好進入傳奇貓咪的修行秘境了嗎？<br>將您的滑鼠滑入道場，帶領貓咪突破連擊極限！</p>
+            <button id="btn-enter" class="btn-primary">進入道場 (Enter Dojo)</button>
+        </div>
+    </div>
+
+    <!-- Main Dojo App Container -->
+    <div id="app-container" class="dojo-theme">
+        <!-- Background Ambient Grid / Lines -->
+        <div class="dojo-grid"></div>
+        <div class="lantern left">🏮</div>
+        <div class="lantern right">🏮</div>
+
+        <!-- High-Performance Visual Canvas -->
+        <canvas id="arena-canvas"></canvas>
+
+        <!-- Dynamic Training Target (Follows Cursor) -->
+        <div id="training-target" class="target-yarn">
+            <div class="target-inner">🧶</div>
+            <div class="target-shadow"></div>
+        </div>
+
+        <!-- Interactive Kung-Fu Cat Character Container -->
+        <div id="kungfu-cat" class="cat-sprite shadow-aura">
+            <div class="aura-effect"></div>
+            <!-- Hero Image Wrapper -->
+            <div class="cat-image-wrapper">
+                <img id="cat-img" src="default_kungfu_cat.png" alt="Kung-Fu Cat" crossorigin="anonymous">
+            </div>
+            <!-- Punch/Kick Visual Hitbox Indicators -->
+            <div class="paw-indicator left">🐾</div>
+            <div class="paw-indicator right">🐾</div>
+        </div>
+
+        <!-- Floating Glassmorphic UI Dashboard (Left Panel) -->
+        <aside id="dojo-panel" class="glass-panel">
+            <header class="panel-header">
+                <h1 class="logo-title">武打貓咪修行錄</h1>
+                <span class="status-badge">道場等級：傳奇</span>
+            </header>
+
+            <hr class="separator">
+
+            <!-- STATS COUNTERS -->
+            <section class="panel-section stats-grid">
+                <div class="stat-card">
+                    <span class="stat-label">當前連擊 COMBO</span>
+                    <span id="stat-combo" class="stat-val num-glow">0</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">極限最高連擊</span>
+                    <span id="stat-max-combo" class="stat-val">0</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">累積修行值 (DMG)</span>
+                    <span id="stat-damage" class="stat-val">0</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">每秒打擊 HITS/S</span>
+                    <span id="stat-speed" class="stat-val">0.0</span>
+                </div>
+            </section>
+
+            <!-- FRENZY METER -->
+            <section class="panel-section">
+                <div class="frenzy-header">
+                    <span class="section-title text-orange">🔥 狂熱爆發能量條</span>
+                    <span id="frenzy-pct">0%</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div id="frenzy-fill" class="progress-bar-fill"></div>
+                </div>
+            </section>
+
+            <!-- CUSTOMIZATION CONTROLS -->
+            <section class="panel-section">
+                <h2 class="section-title">🐾 選擇出戰貓咪 (Choose Hero)</h2>
+                <div class="avatar-selector">
+                    <button class="avatar-btn active" data-hero="default">
+                        <span class="hero-emoji">🐱</span> 功夫灰貓
+                    </button>
+                    <button class="avatar-btn" data-hero="fire">
+                        <span class="hero-emoji">🐯</span> 烈焰虎斑
+                    </button>
+                    <button class="avatar-btn" data-hero="shadow">
+                        <span class="hero-emoji">🐈‍⬛</span> 暗影忍貓
+                    </button>
+                    <button class="avatar-btn" data-hero="electro">
+                        <span class="hero-emoji">⚡</span> 雷霆電貓
+                    </button>
+                </div>
+            </section>
+
+            <!-- UPLOAD ZONE -->
+            <section class="panel-section">
+                <div id="drop-zone" class="upload-box">
+                    <div class="upload-icon">📤</div>
+                    <p class="upload-text">拖放或點擊上傳<b>自家貓主子</b>照片</p>
+                    <span class="upload-sub">自動為其注入深厚功夫內力！</span>
+                    <input type="file" id="file-input" accept="image/*" class="hidden-input">
+                </div>
+            </section>
+
+            <!-- COMBAT STYLE -->
+            <section class="panel-section">
+                <h2 class="section-title">⚔️ 功夫招式組合 (Combat Style)</h2>
+                <select id="select-style" class="dojo-select">
+                    <option value="rapid">🐾 貓咪亂舞 (Rapid Claws)</option>
+                    <option value="kick">🌪️ 旋風無影腳 (Dragon Kick)</option>
+                    <option value="fireball">🔥 貓貓波動拳 (Mystic Fireball)</option>
+                    <option value="electro">⚡ 閃電神威掌 (Electro Strike)</option>
+                </select>
+            </section>
+
+            <!-- TARGET TYPE -->
+            <section class="panel-section">
+                <h2 class="section-title">🎯 訓練假人目標 (Training Target)</h2>
+                <div class="target-selector">
+                    <button class="target-btn active" data-target="yarn">🧶 七彩毛線球</button>
+                    <button class="target-btn" data-target="mouse">🐭 吱吱機械鼠</button>
+                    <button class="target-btn" data-target="dummy">🪵 詠春木人樁</button>
+                </div>
+            </section>
+
+            <!-- AUDIO SETTINGS -->
+            <section class="panel-section">
+                <div class="audio-control-row">
+                    <span class="section-title">🔊 道場音效音量</span>
+                    <button id="btn-sound-toggle" class="btn-icon">🔊</button>
+                </div>
+                <div class="slider-row">
+                    <span class="slider-val">0%</span>
+                    <input type="range" id="volume-slider" min="0" max="100" value="50" class="dojo-slider">
+                    <span class="slider-val">100%</span>
+                </div>
+            </section>
+
+            <footer class="panel-footer">
+                <p>滑鼠游標即是沙包！貓咪會極速衝向並不斷攻擊！</p>
+                <p>點擊滑鼠可觸發「重力震擊」提升 5 倍修行值！</p>
+            </footer>
+        </aside>
+
+        <!-- Right Top Status Indicator -->
+        <div id="combo-toast" class="toast-hidden">
+            <span class="toast-icon">⚡</span>
+            <div class="toast-body">
+                <p class="toast-title">FRENZY MODE ACTIVED</p>
+                <p class="toast-sub">進入「七彩神威狂熱狀態」！打擊速度 300%！</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Background Eraser Workshop Modal (去背大師面板) -->
+    <div id="eraser-modal" class="modal-hidden">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h2 class="modal-logo">🐈 貓咪功夫去背工坊 (Neko Eraser Workshop)</h2>
+                <button id="btn-close-modal" class="btn-close">&times;</button>
+            </header>
+            <div class="modal-body">
+                <div class="canvas-container">
+                    <canvas id="eraser-canvas"></canvas>
+                </div>
+                <div class="controls-container">
+                    <p class="control-help">✨ <b>自動去背已啟用！</b><br>您也可以在左側圖片中<b>「直接點擊」</b>想要消除的背景顏色，或滑動下方滑桿微調：</p>
+                    
+                    <div class="control-group">
+                        <label class="control-label">⚡ 自動去背色彩容許值 (Tolerance): <span id="val-tolerance">35</span></label>
+                        <input type="range" id="slider-tolerance" min="0" max="150" value="35" class="dojo-slider">
+                    </div>
+
+                    <div class="control-group-row">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="check-manual-eraser"> 🧹 啟用手動擦除畫筆 (Manual Eraser Brush)
+                        </label>
+                    </div>
+
+                    <div id="manual-controls" class="control-group hidden-control">
+                        <label class="control-label">🪥 擦除畫筆半徑 (Brush Size): <span id="val-brush-size">20</span>px</label>
+                        <input type="range" id="slider-brush-size" min="5" max="80" value="20" class="dojo-slider">
+                    </div>
+
+                    <div class="button-group">
+                        <button id="btn-reset-eraser" class="btn-secondary">🔄 重置畫布 (Reset)</button>
+                        <button id="btn-save-eraser" class="btn-primary">👊 注入道場功夫內力！(Save & Apply)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Logic Script -->
+    <script src="app.js"></script>
+</body>
+</html>
