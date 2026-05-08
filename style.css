@@ -908,6 +908,15 @@ body, html {
 
 /* Media Queries for Responsiveness */
 @media (max-width: 768px) {
+    .overlay { overflow-y: auto; align-items: flex-start; padding: 20px 0; }
+    .overlay-card { padding: 2rem 1.2rem; margin: auto; max-width: 95%; box-sizing: border-box; }
+    .glow-text { font-size: 2rem; }
+    .sub-glow-text { font-size: 1.1rem; margin-bottom: 1.5rem; letter-spacing: 2px; }
+    .card-art { width: 150px; height: 150px; margin-bottom: 1.5rem; }
+    .overlay-kitty { width: 130px; height: 130px; }
+    .overlay-desc { font-size: 0.95rem; margin-bottom: 1.5rem; }
+    .btn-primary { padding: 0.9rem 2rem; font-size: 1rem; }
+
     #app-container {
         flex-direction: column;
     }
